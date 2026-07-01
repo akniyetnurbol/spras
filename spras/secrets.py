@@ -13,6 +13,7 @@ def gurobi() -> Optional[Path]:
     """
     Gets the contents of the gurobi licenses, or None if not specified.
     """
+    import spras.config.config as config
     gurobi_str = config.config.secrets['gurobi']
     if not gurobi_str: return None
 

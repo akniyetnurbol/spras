@@ -99,10 +99,11 @@ def summarize_networks(file_paths: Iterable[Path], node_table: pd.DataFrame, alg
 
         # Algorithm parameters have format { algo : { hashcode : { parameter combos } } }
         param_combo = algo_params[algo][hashcode]
-        del param_combo['_spras_run_name']
+        # del param_combo['_spras_run_name']  # KeyError if key missing
+        param_combo.pop('_spras_run_name', None)
         # We use json.dumps to properly serialize enums as strings,
         # and sort parameters to provide stable summary table output.
-        cur_nw_info.append(json.dumps(param_combo, sort_keys=True))
+        cur_nw_info.append(json.dumps(param_combo, sortgh_keys=True))
 
         # Save the current network information to the network summary list
         nw_info.append(cur_nw_info)

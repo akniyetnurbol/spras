@@ -70,13 +70,13 @@ containers:
 
 algorithms:
   - name: "pathlinker"
-    include: true
+    include: false
     runs:
       run1:
         k: range(100,201,100)
 
   - name: "omicsintegrator1"
-    include: true
+    include: false
     runs:
       run1:
         b: [5, 6]
@@ -85,7 +85,7 @@ algorithms:
         dummy_mode: "file" # Or "terminals", "all", "others"
 
   - name: "omicsintegrator2"
-    include: true
+    include: false
     runs:
       run1:
         b: 4
@@ -95,7 +95,7 @@ algorithms:
         g: 3
 
   - name: "meo"
-    include: true
+    include: false
     runs:
       run1:
         max_path_length: 3
@@ -103,53 +103,60 @@ algorithms:
         rand_restarts: 10
 
   - name: "mincostflow"
-    include: true
+    include: false
     runs:
       run1:
         flow: 1
         capacity: 1
 
   - name: "allpairs"
-    include: true
+    include: false
 
   - name: "domino"
-    include: true
+    include: false
     runs:
       run1:
         slice_threshold: 0.3
         module_threshold: 0.05
 
   - name: "strwr"
-    include: true
+    include: false
     runs:
       run1:
         alpha: [0.85]
         threshold: [100, 200]
 
   - name: "rwr"
-    include: true
+    include: false
     runs:
       run1:
         alpha: [0.85]
         threshold: [100, 200]
 
   - name: "bowtiebuilder"
-    include: true
+    include: false
 
   - name: "responsenet"
-    include: true
+    include: false
     runs:
       run1:
         gamma: [10]
   - name: "diamond"
-    include: true
+    include: false
     runs:
       run1:
         n: 1
 
+  #- name: "netmix2"
+  #  params:
+  #    include: true
   - name: "netmix2"
-    params:
-      include: true
+    include: true
+    runs:
+      run1:
+        # num_edges: 175000  # too large for EGFR similarity matrix (max ~133903)
+        num_edges: 100000
+        density: 0.05 #changed format
 
 # Secrets are used to specify credentials to proprietary services in use
 # by some algorithms. In SPRAS, we .gitignore the `licences` folder for this
@@ -158,7 +165,9 @@ secrets:
   # Gurobi (https://www.gurobi.com/) is a proprietary SMT.
   # It comes with free academic use:
   # https://www.gurobi.com/academia/academic-program-and-licenses/
-  gurobi: "licenses/gurobi.lic"
+  gurobi: "licenses/gurobi.lic" #put the path of the gurobi.lic file here (dont forget to consider from what directory you are running the code from)
+  #gurobi: "spras/licenses/gurobi.lic" 
+
 
 # Here we specify which pathways to run and other file location information.
 # DataLoader.py can currently only load a single dataset
@@ -166,19 +175,22 @@ secrets:
 datasets:
   - # Labels can only contain letters, numbers, or underscores
     label: data0
-    # To run OmicsIntegrator1 with dummy nodes, add dummy.txt file to node_files
-    # or a dummy column to the node table
-    node_files: ["node-prizes.txt", "sources.txt", "targets.txt"]
-    # DataLoader.py can currently only load a single edge file, which is the primary network
-    edge_files: ["network.txt"]
+    # Changed data0 because it used 2 nodes — too small for NetMix2's locfdr step.
+    # node_files: ["node-prizes.txt", "sources.txt", "targets.txt"]
+    # edge_files: ["network.txt"]
+    node_files: ["tps-egfr-prizes.txt"]
+    edge_files: ["phosphosite-irefindex13.0-uniprot.txt"]
     # Placeholder
     other_files: []
     # Relative path from the spras directory
     data_dir: "input"
   - label: data1
-    # Reuse some of the same sources file as 'data0' but different network and targets
-    node_files: ["node-prizes.txt", "sources.txt", "alternative-targets.txt"]
-    edge_files: ["alternative-network.txt"]
+    # Using EGFR data for NetMix2 — has 701 nodes, enough for locfdr to work.
+    # Original (only 2 nodes, too small for NetMix2's locfdr step):
+    # node_files: ["node-prizes.txt", "sources.txt", "alternative-targets.txt"]
+    # edge_files: ["alternative-network.txt"]
+    node_files: ["tps-egfr-prizes.txt"]
+    edge_files: ["phosphosite-irefindex13.0-uniprot.txt"]
     other_files: []
     # Relative path from the spras directory
     data_dir: "input"
@@ -234,7 +246,8 @@ analysis:
   # Machine learning analysis (e.g. clustering) of the pathway output files for each dataset
   ml:
     # ml analysis per dataset
-    include: true
+    # include: true  # requires more than one pathway (multiple parameter combinations)
+    include: false
     # adds ml analysis per algorithm output
     # only runs for algorithms with multiple parameter combinations chosen
     aggregate_per_algorithm: true
