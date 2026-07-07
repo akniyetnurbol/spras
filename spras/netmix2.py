@@ -10,7 +10,7 @@ from spras.interactome import (
     reinsert_direction_col_undirected,
 )
 from spras.prm import PRM
-from spras.util import add_rank_column, duplicate_edges
+from spras.util import add_rank_column, duplicate_edges, prize_to_pval
 
 __all__ = ['NetMix2']
 
@@ -41,13 +41,13 @@ class NetMix2(PRM[NetMix2Params]):
             node_df = data.get_node_columns(['prize'])
         else:
             raise ValueError("Node prizes are required for NetMix2.")
-        # NetMix2 expects p-values (0,1), but SPRAS prizes are arbitrary weights.
-        # Convert prizes to pseudo p-values using exp(-prize): higher prize -> lower p-value (more significant).
-        # Original (raw prizes, not valid p-values for NetMix2):
-        # node_df.to_csv(filename_map['scores'], index=False, columns=['NODEID', 'prize'], header=False, sep='\t')
-        import numpy as np
-        node_df['pval'] = np.exp(-node_df['prize'])
-        node_df.to_csv(filename_map['scores'], index=False, columns=['NODEID', 'pval'], header=False, sep='\t')
+        # NetMix2 requires scores in (0, 1] where lower is better, but SPRAS prizes are arbitrary weights.
+        # Convert prizes to scores using exp(-prize): higher prize -> lower score (more significant).
+        # This is not a true p-value — it is just a number in (0, 1] for NetMix2's input format.
+        # Original (raw prizes, wrong column order, not valid scores for NetMix2):
+        # node_df.to_csv(filename_map['scores'], index=False, columns=['prize', 'NODEID'], header=False, sep='\t')
+        node_df['score'] = node_df['prize'].apply(prize_to_pval)
+        node_df.to_csv(filename_map['scores'], index=False, columns=['NODEID', 'score'], header=False, sep='\t')
 
         edges_df = data.get_interactome()
         edges_df = convert_directed_to_undirected(edges_df)
