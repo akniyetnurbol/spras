@@ -1,4 +1,4 @@
-# Signaling Pathway Reconstruction Analysis Streamliner  (SPRAS)
+# Signaling Pathway Reconstruction Analysis Streamliner (SPRAS)
 [![Test SPRAS](https://github.com/Reed-CompBio/spras/actions/workflows/test-spras.yml/badge.svg)](https://github.com/Reed-CompBio/spras/actions/workflows/test-spras.yml)
 [![Documentation](https://readthedocs.org/projects/spras/badge/?version=latest)](https://spras.readthedocs.io)
 
