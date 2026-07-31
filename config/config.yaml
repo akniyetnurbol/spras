@@ -134,7 +134,7 @@ algorithms:
         capacity: 1
 
   - name: "allpairs"
-    include: false
+    include: true
 
   - name: "domino"
     include: false
